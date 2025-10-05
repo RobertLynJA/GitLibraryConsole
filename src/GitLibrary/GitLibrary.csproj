@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.16" />
+    </ItemGroup>
+
 </Project>
