@@ -11,5 +11,13 @@ class Program
 
         var currentBranch = await git.GetCurrentBranchNameAsync();
         Console.WriteLine($"Current branch: {currentBranch}");
+        
+        var branches = await git.GetAllBranchesAsync();
+        Console.WriteLine("All branches:");
+        foreach (var branch in branches)
+        {
+            Console.WriteLine(branch);
+        }
+            
     }
 }
