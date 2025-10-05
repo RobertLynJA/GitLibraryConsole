@@ -1,6 +1,6 @@
 namespace GitLibrary.Commands.Data;
 
-public sealed record GitCommandResult(
+internal sealed record GitCommandResult(
     int ExitCode,
     string StandardOutput,
     string StandardError)
