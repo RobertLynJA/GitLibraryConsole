@@ -8,14 +8,9 @@ public class Git
     {
         _directoryInfo = directoryInfo ?? throw new ArgumentNullException(nameof(directoryInfo));
 
-        if (!IsGitRepository(_directoryInfo))
+        if (!Utils.GitRepositoryUtils.IsGitRepository(_directoryInfo))
         {
             throw new ArgumentException("The provided path is not a Git repository.");
         }
-    }
-    
-    public static bool IsGitRepository(System.IO.Abstractions.IDirectoryInfo directoryInfo)
-    {
-        return directoryInfo.Exists && directoryInfo.GetDirectories(".git").Length > 0;
     }
 }
