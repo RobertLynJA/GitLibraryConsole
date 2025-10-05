@@ -1,6 +1,11 @@
+using GitLibrary.Commands.Data;
+
 namespace GitLibrary.Commands.Interfaces;
 
 internal interface IGitCommand
 {
-    void Execute();
+    string Name { get; }
+    string Description { get; }
+
+    Task<GitCommandResult> ExecuteAsync(GitCommandContext context, CancellationToken cancellationToken = default);
 }

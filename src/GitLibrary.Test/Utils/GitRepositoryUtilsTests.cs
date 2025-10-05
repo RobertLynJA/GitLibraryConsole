@@ -9,30 +9,45 @@ public class GitRepositoryUtilsTests
     [Fact]
     public void IsGitRepository_ReturnsTrue_WhenGitDirectoryExists()
     {
+        // Arrange
         var dir = Substitute.For<IDirectoryInfo>();
         var gitDir = Substitute.For<IDirectoryInfo>();
         dir.Exists.Returns(true);
         dir.GetDirectories(".git").Returns([gitDir]);
 
-        Assert.True(GitRepositoryUtils.IsGitRepository(dir));
+        // Act 
+        var isGitRepository = GitRepositoryUtils.IsGitRepository(dir);
+        
+        // Assert
+        Assert.True(isGitRepository);
     }
 
     [Fact]
     public void IsGitRepository_ReturnsFalse_WhenDirectoryDoesNotExist()
     {
+        // Arrange
         var dir = Substitute.For<IDirectoryInfo>();
         dir.Exists.Returns(false);
 
-        Assert.False(GitRepositoryUtils.IsGitRepository(dir));
+        // Act
+        var isGitRepository = GitRepositoryUtils.IsGitRepository(dir);
+        
+        // Assert
+        Assert.False(isGitRepository);
     }
     
     [Fact]
     public void IsGitRepository_ReturnsFalse_WhenGitDirectoryDoesNotExist()
     {
+        // Arrange
         var dir = Substitute.For<IDirectoryInfo>();
         dir.Exists.Returns(true);
         dir.GetDirectories(".git").Returns([]);
 
-        Assert.False(GitRepositoryUtils.IsGitRepository(dir));
+        // Act
+        var isGitRepository = GitRepositoryUtils.IsGitRepository(dir);
+        
+        // Assert
+        Assert.False(isGitRepository);
     }
 }
