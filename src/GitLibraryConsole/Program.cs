@@ -1,9 +1,15 @@
-﻿namespace GitLibraryConsole;
+﻿using System.IO.Abstractions;
+using GitLibrary;
+
+namespace GitLibraryConsole;
 
 class Program
 {
-    static void Main(string[] args)
+    async static Task Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        Git git = new((DirectoryInfoBase)new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.Parent.Parent.Parent);
+
+        var currentBranch = await git.GetCurrentBranchNameAsync();
+        Console.WriteLine($"Current branch: {currentBranch}");
     }
 }

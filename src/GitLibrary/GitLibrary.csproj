@@ -9,6 +9,7 @@
     <ItemGroup>
       <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.16" />
         <InternalsVisibleTo Include="GitLibrary.Test" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
     </ItemGroup>
 
 </Project>
