@@ -8,13 +8,10 @@ class Program
     async static Task Main(string[] args)
     {
         Git git = new((DirectoryInfoBase)new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.Parent.Parent.Parent);
-
-        var currentBranch = await git.Branches.GetCurrentBranchNameAsync();
-        Console.WriteLine($"Current branch: {currentBranch}");
         
-        var branches = await git.Branches.GetAllBranchesAsync();
+        var branches2 = await git.Branches.GetAllBranchesAsync();
         Console.WriteLine("All branches:");
-        foreach (var branch in branches)
+        foreach (var branch in branches2)
         {
             Console.WriteLine(branch);
         }

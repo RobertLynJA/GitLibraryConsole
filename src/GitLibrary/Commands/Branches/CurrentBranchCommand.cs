@@ -2,7 +2,7 @@ using GitLibrary.Commands.Data;
 using GitLibrary.Commands.Interfaces;
 using GitLibrary.Commands.Processes.Interfaces;
 
-namespace GitLibrary.Commands;
+namespace GitLibrary.Commands.Branches;
 
 internal class CurrentBranchCommand(IProcessRunner processRunner) : IGitCommand
 {

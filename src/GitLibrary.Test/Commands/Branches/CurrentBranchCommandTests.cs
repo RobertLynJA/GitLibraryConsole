@@ -1,16 +1,16 @@
-using GitLibrary.Commands;
+using System.IO.Abstractions;
+using GitLibrary.Commands.Branches;
 using GitLibrary.Commands.Data;
 using GitLibrary.Commands.Processes.Interfaces;
 using NSubstitute;
-using System.IO.Abstractions;
 using Xunit.Abstractions;
 
-namespace GitLibrary.Test.Commands;
+namespace GitLibrary.Test.Commands.Branches;
 
-public class AllBranchesCommandTests(ITestOutputHelper output)
+public class CurrentBranchCommandTests(ITestOutputHelper output)
 {
     [Fact]
-    public async Task ExecuteAsync_ReturnsBranchNames_WhenGitCommandSucceeds()
+    public async Task ExecuteAsync_ReturnsBranchName_WhenGitCommandSucceeds()
     {
         // Arrange
         var processRunnerMock = Substitute.For<IProcessRunner>();
@@ -21,22 +21,22 @@ public class AllBranchesCommandTests(ITestOutputHelper output)
         processRunnerMock
             .RunAsync(
                 "git",
-                Arg.Is<IReadOnlyList<string>>(args => args.SequenceEqual(new[] { "branch", "--list", "--all", "--no-color" })),
+                Arg.Is<IReadOnlyList<string>>(args => args.SequenceEqual(new[] { "rev-parse", "--abbrev-ref", "HEAD" })),
                 context.DirectoryInfo.FullName,
                 context.Environment,
                 Arg.Any<CancellationToken>())
-            .Returns(new ProcessResult(0, "main\ndevelop\nfeature-xyz", string.Empty));
-        var command = new AllBranchesCommand(processRunnerMock);
+            .Returns(new ProcessResult(0, "main", string.Empty));
+        var command = new CurrentBranchCommand(processRunnerMock);
 
         // Act
         var result = await command.ExecuteAsync(context);
 
         // Assert
         Assert.Equal(0, result.ExitCode);
-        Assert.Equal("main\ndevelop\nfeature-xyz", result.StandardOutput);
+        Assert.Equal("main", result.StandardOutput);
         Assert.Equal(string.Empty, result.StandardError);
     }
-    
+
     [Fact]
     public async Task ExecuteAsync_ThrowsArgumentNullException_WhenContextIsNull()
     {
@@ -65,12 +65,12 @@ public class AllBranchesCommandTests(ITestOutputHelper output)
         processRunnerMock
             .RunAsync(
                 "git",
-                Arg.Is<IReadOnlyList<string>>(args => args.SequenceEqual(new[] { "branch", "--list", "--all", "--no-color" })),
+                Arg.Is<IReadOnlyList<string>>(args => args.SequenceEqual(new[] { "rev-parse", "--abbrev-ref", "HEAD" })),
                 context.DirectoryInfo.FullName,
                 context.Environment,
                 Arg.Any<CancellationToken>())
             .Returns(new ProcessResult(1, string.Empty, "fatal: not a git repository"));
-        var command = new AllBranchesCommand(processRunnerMock);
+        var command = new CurrentBranchCommand(processRunnerMock);
 
         // Act
         var result = await command.ExecuteAsync(context);
@@ -93,7 +93,7 @@ public class AllBranchesCommandTests(ITestOutputHelper output)
         var context = new GitCommandContext(dir, new Dictionary<string,string>());
         var cancellationTokenSource = new CancellationTokenSource();
         await cancellationTokenSource.CancelAsync();
-        var command = new AllBranchesCommand(processRunnerMock);
+        var command = new CurrentBranchCommand(processRunnerMock);
 
         // Act
         var ex = await Record.ExceptionAsync(() => command.ExecuteAsync(context, cancellationTokenSource.Token));
@@ -102,5 +102,5 @@ public class AllBranchesCommandTests(ITestOutputHelper output)
         Assert.NotNull(ex);
         output.WriteLine("Caught exception: {0}", ex.GetType().FullName);
         Assert.IsType<OperationCanceledException>(ex);
-    }    
+    }
 }

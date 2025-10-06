@@ -1,4 +1,5 @@
 using GitLibrary.Commands;
+using GitLibrary.Commands.Branches;
 using GitLibrary.Data;
 using GitLibrary.Services.Support;
 using GitLibrary.Core;
@@ -15,7 +16,7 @@ internal sealed class GitBranchService(GitRepositoryContext ctx) : GitServiceBas
         EnsureSuccess(result, "Failed to get current branch");
         return result.StandardOutput.Trim();
     }
-
+    
     public async Task<IReadOnlyList<Branch>> GetAllBranchesAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -27,16 +28,21 @@ internal sealed class GitBranchService(GitRepositoryContext ctx) : GitServiceBas
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
             .Select(rawLine =>
             {
-                var isCurrent = rawLine.StartsWith('*');
-                var line = rawLine.Trim().TrimStart('*').Trim();
-                var isRemote = line.StartsWith("remotes/");
-                var shortName = isRemote ? line.Substring("remotes/".Length) : line;
-                var fullName = isRemote ? line : $"refs/heads/{shortName}";
-                return new Branch(shortName, fullName, isCurrent, isRemote);
+                var line = rawLine.Trim().Trim('\'').Trim();
+                var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 3)
+                    throw new InvalidOperationException($"Unexpected branch line format: '{rawLine}'");
+                
+                var isCurrent = parts.Length > 3 && parts[3] == "*";
+                var fullName = parts[1];
+                var shortName = parts[2];
+                var hashCode = parts[0];
+                var isRemote = fullName.StartsWith("refs/remotes/");
+                return new Branch(fullName, shortName, isCurrent, isRemote, hashCode);
             })
             .ToList()
             .AsReadOnly();
-
+        
         return branches;
     }
 }

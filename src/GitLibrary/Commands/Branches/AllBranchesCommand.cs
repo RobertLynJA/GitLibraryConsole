@@ -2,7 +2,7 @@ using GitLibrary.Commands.Data;
 using GitLibrary.Commands.Interfaces;
 using GitLibrary.Commands.Processes.Interfaces;
 
-namespace GitLibrary.Commands;
+namespace GitLibrary.Commands.Branches;
 
 internal class AllBranchesCommand(IProcessRunner processRunner) : IGitCommand
 {
@@ -16,11 +16,17 @@ internal class AllBranchesCommand(IProcessRunner processRunner) : IGitCommand
         ArgumentNullException.ThrowIfNull(context);
         
         return _processRunner.RunAsync(
-            "git",
-            ["branch", "--list", "--all", "--no-color"],
-            context.DirectoryInfo.FullName,
-            context.Environment,
-            cancellationToken)
+                "git",
+                [
+                    "for-each-ref", 
+                    "--sort=-committerdate", 
+                    "--exclude=refs/remotes/*/HEAD", 
+                    "--format='%(objectname) %(refname) %(refname:short) %(if)%(HEAD)%(then)*%(end)'", 
+                    "refs/heads/", "refs/remotes/"
+                ],
+                context.DirectoryInfo.FullName,
+                context.Environment,
+                cancellationToken)
             .ContinueWith(task =>
             {
                 var result = task.Result;
